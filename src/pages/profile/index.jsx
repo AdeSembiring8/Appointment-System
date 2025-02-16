@@ -56,27 +56,27 @@ export default function Profile() {
             <h1>Profile</h1>
             <div style={styles.formGroup}>
                 <label>Name:</label>
-                <input 
-                    type="text" 
-                    value={name} 
-                    onChange={(e) => setName(e.target.value)} 
-                    style={styles.input} 
+                <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    style={styles.input}
                 />
             </div>
             <div style={styles.formGroup}>
                 <label>Username:</label>
-                <input 
-                    type="text" 
-                    value={username} 
-                    disabled 
-                    style={styles.inputDisabled} 
+                <input
+                    type="text"
+                    value={username}
+                    disabled
+                    style={styles.inputDisabled}
                 />
             </div>
             <div style={styles.formGroup}>
                 <label>Preferred Timezone:</label>
-                <select 
-                    value={preferredTimezone} 
-                    onChange={(e) => setPreferredTimezone(e.target.value)} 
+                <select
+                    value={preferredTimezone}
+                    onChange={(e) => setPreferredTimezone(e.target.value)}
                     style={styles.select}
                 >
                     {timezones.map((tz) => (

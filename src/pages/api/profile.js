@@ -10,14 +10,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Ambil user_id dari request (bisa dari sesi atau token)
         const { userId, name, preferred_timezone } = req.body;
-
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ message: "Invalid user ID" });
         }
-
-        // Update profil
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { name, preferred_timezone },

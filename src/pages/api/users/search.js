@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         try {
             const users = await User.find(
                 { username: { $regex: query, $options: "i" } },
-                "_id name username" // Hanya ambil _id, name, dan username
+                "_id name username" 
             ).limit(10);
 
             res.status(200).json(users);

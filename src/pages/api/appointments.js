@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             const user = await User.findById(userId);
             if (!user) return res.status(404).json({ message: "User not found" });
 
-            const userTimezone = user.preferred_timezone || "UTC"; // Default UTC jika tidak ada preferensi
+            const userTimezone = user.preferred_timezone || "UTC"; 
 
             const now = new Date();
             await Appointment.deleteMany({ end: { $lt: now } });
@@ -28,8 +28,6 @@ export default async function handler(req, res) {
                 .populate("creator_id", "name username preferred_timezone")
                 .populate("participants", "name username preferred_timezone")
                 .sort({ start: 1 });
-
-            // Konversi waktu ke zona waktu user yang login
             appointments = appointments.map(appt => ({
                 ...appt._doc,
                 start: moment.utc(appt.start).tz(userTimezone).format("YYYY-MM-DD HH:mm:ss"),
@@ -56,18 +54,13 @@ export default async function handler(req, res) {
             if (!mongoose.Types.ObjectId.isValid(creator_id)) {
                 return res.status(400).json({ message: "creator_id tidak valid" });
             }
-
-            // Ambil zona waktu pengguna dari database
             const creator = await User.findById(creator_id);
             if (!creator) return res.status(404).json({ message: "Creator tidak ditemukan" });
 
-            const userTimezone = creator.preferred_timezone || "UTC"; // Default ke UTC jika tidak ada
-
-            // Konversi waktu UTC ke zona waktu pengguna
+            const userTimezone = creator.preferred_timezone || "UTC"; 
             const startLocal = moment.utc(start).tz(userTimezone);
             const endLocal = moment.utc(end).tz(userTimezone);
 
-            // Validasi hanya boleh antara jam 08:00 - 17:00 di zona waktu pengguna
             const startHour = startLocal.hour();
             const endHour = endLocal.hour();
 
@@ -75,15 +68,14 @@ export default async function handler(req, res) {
                 return res.status(400).json({ message: "Waktu janji temu harus antara 08:00 - 17:00 di zona waktu pengguna." });
             }
 
-            // Cek konflik jadwal
             const participantDocs = await User.find({ _id: { $in: participants } }).select("_id");
             const participantIds = participantDocs.map((user) => user._id);
 
+            const allParticipants = [...participantIds, creator_id]; 
+
             const conflictingAppointments = await Appointment.find({
                 $and: [
-                    {
-                        $or: [{ creator_id }, { participants: { $in: [...participantIds, creator_id] } }]
-                    },
+                    { participants: { $in: allParticipants } }, 
                     { start: { $lt: new Date(end) } },
                     { end: { $gt: new Date(start) } }
                 ]
@@ -97,7 +89,6 @@ export default async function handler(req, res) {
                 return res.status(400).json({ message: "No valid participants found" });
             }
 
-            // Simpan janji temu (tetap dalam UTC)
             const appointment = new Appointment({
                 title,
                 creator_id,

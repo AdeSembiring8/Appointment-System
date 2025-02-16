@@ -9,6 +9,7 @@ export default function Appointments() {
     const [appointments, setAppointments] = useState([]);
     const router = useRouter();
     const [username, setUsername] = useState("");
+    const [showDropdown, setShowDropdown] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -60,17 +61,30 @@ export default function Appointments() {
         fetchAppointments();
     }, [router]);
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user_id");
+        router.push("/login");
+    };
 
     return (
         <div style={styles.container}>
             <div style={styles.headerContainer}>
                 <h1 style={styles.title}>Appointments</h1>
-                <p
-                    style={{ ...styles.title, cursor: "pointer", color: "black" }}
-                    onClick={() => router.push("/profile")}
-                >
-                    {username}
-                </p>
+                <div style={styles.userMenu}>
+                    <p
+                        style={{ ...styles.title, cursor: "pointer", color: "black" }}
+                        onClick={() => setShowDropdown(!showDropdown)}
+                    >
+                        {username}
+                    </p>
+                    {showDropdown && (
+                        <div style={styles.dropdownMenu}>
+                            <p onClick={() => router.push("/profile")} style={styles.dropdownItem}>Profile</p>
+                            <p onClick={handleLogout} style={styles.dropdownItem}>Logout</p>
+                        </div>
+                    )}
+                </div>
             </div>
             <ul style={styles.list}>
                 {appointments.map((appointment) => (
